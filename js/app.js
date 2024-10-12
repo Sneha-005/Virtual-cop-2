@@ -1,6 +1,6 @@
 const homeText = document.querySelector(".bg_home");
 
-let fontSize = 7;
+let fontSize = 2.5;
 let increasing = true;
 
 //udating font
@@ -11,13 +11,13 @@ function updateFontSize() {
 function animateText() {
   setTimeout(() => {
     if (increasing) {
-      fontSize += 0.1;
-      if (fontSize >= 3) {
+      fontSize += 0.05;
+      if (fontSize >= 2.5) {
         increasing = false;
       }
     } else {
-      fontSize -= 0.1;
-      if (fontSize <= 2.5) {
+      fontSize -= 0.05;
+      if (fontSize <= 2) {
         increasing = true;
       }
     }

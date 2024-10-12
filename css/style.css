@@ -7,14 +7,12 @@
 }
 
 body {
-    font-family: "Press Start 2P",system-ui;
+    font-family: "Press Start 2P" ,system-ui;
     min-height: 100vh;
 }
 
-
-
 .bg_home {
-    --font-size: 3rem;
+    --font-size: 2.5rem;
     min-height: 100vh;
     position: relative;
     top: 0;
