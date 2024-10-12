@@ -1,0 +1,41 @@
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: "Press Start 2P",system-ui;
+    min-height: 100vh;
+}
+
+
+
+.bg_home {
+    --font-size: 7rem;
+    min-height: 100vh;
+    position: relative;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #333;
+    background-image: url('../images/virtua.png');
+    background-size: cover;
+    z-index: 1;
+}
+
+.bg_home::after {
+    min-height: 100%;
+    min-width: 100%;
+    content: "Press To Start";
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: var(--font-size);
+    color: #fff;
+    position: absolute;
+    background-color: #00000086;
+}
