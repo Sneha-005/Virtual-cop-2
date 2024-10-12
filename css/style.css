@@ -14,7 +14,7 @@ body {
 
 
 .bg_home {
-    --font-size: 7rem;
+    --font-size: 3rem;
     min-height: 100vh;
     position: relative;
     top: 0;
@@ -30,7 +30,7 @@ body {
 .bg_home::after {
     min-height: 100%;
     min-width: 100%;
-    content: "Press To Start";
+    content: "Click Here To Start";
     display: flex;
     justify-content: center;
     align-items: center;
