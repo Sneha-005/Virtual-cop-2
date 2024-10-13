@@ -17,3 +17,18 @@ window.addEventListener("load", function () {
         }
     }, 30);
 });
+
+const city = document.getElementById("city");
+city.addEventListener("click", function() {
+    window.location.href = "city.html";
+});
+
+const town = document.getElementById("town");
+town.addEventListener("click", function() {
+    alert("Town(MEDIUM LEVEL) is not available yet.");
+});
+
+const road = document.getElementById("road");
+road.addEventListener("click", function () {
+  alert("Road(EXPERT LEVEL) is not available yet.");
+});
