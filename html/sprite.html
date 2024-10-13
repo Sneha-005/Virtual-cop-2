@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>2D Sprite Animation</title>
+    <style>
+        body {
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f4f4f4;
+        }
+
+        canvas {
+            border: 2px solid black;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="gameCanvas" width="800" height="600"></canvas>
+
+    <script>
+        // Sprite class definition to manage animation
+        class Sprite {
+            constructor(ctx, imageSrc, frameWidth, frameHeight, totalFrames, animationSpeed) {
+                this.ctx = ctx;
+                this.image = new Image();
+                this.image.src = imageSrc;
+                this.frameWidth = frameWidth;
+                this.frameHeight = frameHeight;
+                this.totalFrames = totalFrames;
+                this.animationSpeed = animationSpeed; // Time in ms per frame
+                this.currentFrame = 0;
+                this.elapsedTime = 0;
+                this.isPlaying = false; // Add a flag to check if animation is playing
+            }
+
+            draw(xPos, yPos, deltaTime) {
+                if (this.isPlaying) {
+                    // Update elapsed time and frame
+                    this.elapsedTime += deltaTime;
+                    if (this.elapsedTime >= this.animationSpeed) {
+                        this.currentFrame = (this.currentFrame + 1) % this.totalFrames;
+                        this.elapsedTime = 0;
+                    }
+
+                    // Get the source position for the current frame
+                    const srcX = this.currentFrame * this.frameWidth;
+
+                    // Clear the previous frame
+                    this.ctx.clearRect(xPos, yPos, this.frameWidth, this.frameHeight);
+
+                    // Draw the current frame from the sprite sheet
+                    this.ctx.drawImage(this.image, srcX, 0, this.frameWidth, this.frameHeight, xPos, yPos, this.frameWidth, this.frameHeight);
+                }
+            }
+
+            startAnimation() {
+                this.isPlaying = true;  // Start the animation
+                this.currentFrame = 0;  // Reset to the first frame
+            }
+
+            stopAnimation() {
+                this.isPlaying = false;  // Stop the animation
+                this.currentFrame = 0;  // Reset to the first frame
+            }
+        }
+
+        // Game setup
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        let deltaTime = 0;
+        let lastTimestamp = 0;
+
+        // Create different sprite animations
+        const walkingAnimation = new Sprite(ctx, '../images/Run.png', 150, 150, 6, 300);  // Walking sprite (6 frames, 100ms/frame)
+        const jumpingAnimation = new Sprite(ctx, '../images/Shot_1.png', 150, 150, 4, 300);  // Jumping sprite (4 frames, 150ms/frame)
+        const attackingAnimation = new Sprite(ctx, '../images/Idle.png', 150, 150, 5, 300);  // Attacking sprite (5 frames, 80ms/frame)
+
+        // Default current animation
+        let currentAnimation = walkingAnimation;
+
+        // Handle user input for animation change
+        document.addEventListener('keydown', (event) => {
+            switch (event.key) {
+                case 'ArrowRight':  // Walk when right arrow is pressed
+                    currentAnimation.stopAnimation();  // Stop any other animation
+                    currentAnimation = walkingAnimation;
+                    currentAnimation.startAnimation();  // Start walking animation
+                    break;
+                case 'Space':  // Jump when space is pressed
+                    currentAnimation.stopAnimation();  // Stop any other animation
+                    currentAnimation = jumpingAnimation;
+                    currentAnimation.startAnimation();  // Start jumping animation
+                    break;
+                case 'A':  // Attack when 'A' key is pressed
+                    currentAnimation.stopAnimation();  // Stop any other animation
+                    currentAnimation = attackingAnimation;
+                    currentAnimation.startAnimation();  // Start attacking animation
+                    break;
+            }
+        });
+
+        // Stop animation when key is released
+        document.addEventListener('keyup', (event) => {
+            if (event.key === 'ArrowRight' || event.key === 'Space' || event.key === 'A') {
+                currentAnimation.stopAnimation();  // Stop animation when key is released
+            }
+        });
+
+        // Update the animation frame
+        function updateAnimation(timestamp) {
+            deltaTime = timestamp - lastTimestamp;  // Calculate time between frames
+            lastTimestamp = timestamp;
+
+            // Clear the canvas and draw the current frame of the active animation
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            currentAnimation.draw(100, 100, deltaTime);
+
+            // Call the updateAnimation function again for the next frame
+            requestAnimationFrame(updateAnimation);
+        }
+
+        // Start the animation loop
+        requestAnimationFrame(updateAnimation);
+    </script>
+</body>
+</html>

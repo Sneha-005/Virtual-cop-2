@@ -1,72 +1,6 @@
-class Character {
-  constructor(x, y, width, height, color) {
-    this.x = x;
-    this.y = y;
-    this.width = width;
-    this.height = height;
-    this.color = color;
-    this.speed = 10;
-    this.minSize = 20;
-    this.originalSize = width;
-  }
-
-  draw(ctx) {
-    ctx.fillStyle = this.color;
-    ctx.fillRect(this.x, this.y, this.width, this.height);
-  }
-
-  moveUp() {
-    if (this.isInsideBoundary(this.x, this.y - this.speed)) {
-      this.y -= this.speed;
-      this.decreaseSize();
-    }
-  }
-
-  moveDown() {
-    if (this.isInsideBoundary(this.x, this.y + this.speed)) {
-      this.y += this.speed;
-      this.increaseSize();
-    }
-  }
-
-  moveLeft() {
-    if (this.isInsideBoundary(this.x - this.speed, this.y)) {
-      this.x -= this.speed;
-    }
-  }
-
-  moveRight() {
-    if (this.isInsideBoundary(this.x + this.speed, this.y)) {
-      this.x += this.speed;
-    }
-  }
-
-  decreaseSize() {
-    this.width = Math.max(this.minSize, this.width - 1);
-    this.height = Math.max(this.minSize, this.height - 1);
-  }
-
-  increaseSize() {
-    this.width = Math.min(this.originalSize, this.width + 1);
-    this.height = Math.min(this.originalSize, this.height + 1);
-  }
-
-  isInsideBoundary(x, y) {
-    let inside = false;
-    for (let i = 0, j = boundaries.length - 1; i < boundaries.length; j = i++) {
-      const [xi, yi] = boundaries[i];
-      const [xj, yj] = boundaries[j];
-      const intersect =
-        yi > y !== yj > y && x < ((xj - xi) * (y - yi)) / (yj - yi) + xi;
-      if (intersect) inside = !inside;
-    }
-    return inside;
-  }
-
-  update() {
-    // Character stays in the center, no need to update position
-  }
-}
+import { Character } from "./classes.js";
+import { HidingObject } from "./classes.js";
+import { Enemy } from "./enemy.js";
 
 const canvas = document.getElementById("canvas");
 const ctx = canvas.getContext("2d");
@@ -83,21 +17,13 @@ let img2X = canvas.width;
 
 const speed = 5;
 
-const character = new Character(
-  canvas.width / 2 - 15,
-  canvas.height - 60,
-  60,
-  60,
-  "orange"
-);
-
 const boundaries = [
   [158, 681],
   [2, 373],
   [0, 485],
   [180, 525],
-  [160, 642],
-  [1480, 645],
+  [160, 692],
+  [1480, 695],
   [1456, 374],
   [857, 368],
   [525, 299],
@@ -106,6 +32,56 @@ const boundaries = [
   [190, 376],
   [0, 381],
 ];
+
+const idleSprite = new Image();
+idleSprite.src = "../images/Idle.png";
+const runningSprite = new Image();
+runningSprite.src = "../images/Run.png";
+const shootingSprite = new Image();
+shootingSprite.src = "../images/Shot_1.png";
+
+const character = new Character(idleSprite, runningSprite, shootingSprite, 5, {
+  idle: 7,
+  running: 8,
+  shooting: 4,
+}, boundaries);
+
+character.x = (canvas.width - character.spriteWidth) / 2;
+character.y = canvas.height - character.spriteHeight - 100;
+
+const hidingObject = new HidingObject(
+  300,
+  300, 
+  192,
+  192,
+  "../images/Ride.png",
+  1
+);
+
+const enemyPoints = [
+  { x: 644, y: 141 },
+  { x: 488, y: 261 },
+  { x: 176, y: 282 },
+  { x: 984, y: 306 },
+  { x: 1163, y: 311 },
+  { x: 476, y: 266 }
+];
+
+const enemies = enemyPoints.map(point => new Enemy(point.x, point.y));
+
+
+const safeZone = {
+  x1: 332,
+  y1: 484,
+  x2: 469,
+  y2: 567
+};
+
+function loadImage(image) {
+  return new Promise((resolve) => {
+    image.onload = resolve;
+  });
+}
 
 function drawBoundaries() {
   ctx.strokeStyle = "transparent";
@@ -122,34 +98,64 @@ function drawBoundaries() {
 function draw() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-  // Draw background images
+  
   ctx.drawImage(img1, img1X, 0, canvas.width, canvas.height);
   ctx.drawImage(img2, img2X, 0, canvas.width, canvas.height);
 
-  // Draw boundaries
   drawBoundaries();
 
-  // Draw character
-  character.draw(ctx);
+  
+  if (hidingObject.isCharacterBehind(character)) {
+    hidingObject.draw(ctx);
+    character.updateFrame();
+    character.draw(ctx);
+  } else {
+    character.updateFrame();
+    character.draw(ctx);
+    hidingObject.draw(ctx);
+  }
+
+
+  enemies.forEach(enemy => enemy.draw(ctx));
+
+  enemies.forEach(enemy => {
+    if (enemy.isCharacterColliding(character) && !isCharacterInSafeZone(character)) {
+      console.log('Character collided with enemy!');
+    }
+  });
 
   requestAnimationFrame(draw);
 }
 
+function isCharacterInSafeZone(character) {
+  const charCenterX = character.x + character.spriteWidth / 2;
+  const charCenterY = character.y + character.spriteHeight / 2;
+  return (
+    charCenterX >= safeZone.x1 &&
+    charCenterX <= safeZone.x2 &&
+    charCenterY >= safeZone.y1 &&
+    charCenterY <= safeZone.y2
+  );
+}
+
+function shootAtCharacter(enemy) {
+  console.log(`Enemy at (${enemy.x}, ${enemy.y}) shoots at character!`);
+}
+
 document.addEventListener("keydown", (event) => {
-  if (event.key === "ArrowLeft") {
-    img1X += speed;
-    img2X += speed;
-  } else if (event.key === "ArrowRight") {
-    img1X -= speed;
-    img2X -= speed;
-  } else if (event.key === "w") {
-    character.moveUp();
-  } else if (event.key === "s") {
-    character.moveDown();
-  } else if (event.key === "a") {
-    character.moveLeft();
-  } else if (event.key === "d") {
-    character.moveRight();
+  switch (event.key) {
+    case "w":
+      character.moveUp(hidingObject);
+      break;
+    case "s":
+      character.moveDown(hidingObject);
+      break;
+    case "a":
+      character.moveLeft(hidingObject);
+      break;
+    case "d":
+      character.moveRight(hidingObject);
+      break;
   }
 
   if (img1X >= canvas.width) {
@@ -165,20 +171,39 @@ document.addEventListener("keydown", (event) => {
   }
 });
 
-img1.onload = () => {
-  img2.onload = () => {
-    draw();
-  };
-};
+document.addEventListener("keyup", (event) => {
+  if (!["w", "a", "s", "d"].includes(event.key)) {
+    return;
+  }
+  character.setIdle();
+});
 
 canvas.addEventListener("click", (event) => {
-  // Get the bounding rectangle of the canvas
-  const rect = canvas.getBoundingClientRect();
+  const facingRight = event.clientX >= canvas.width / 2;
+  character.shoot(facingRight);
+  console.log(`Mouse click coordinates: (${event.clientX}, ${event.clientY})`);
 
-  // Calculate the mouse coordinates relative to the canvas
-  const x = event.clientX - rect.left;
-  const y = event.clientY - rect.top;
+  enemies.forEach((enemy, index) => {
+    const dx = event.clientX - enemy.x;
+    const dy = event.clientY - enemy.y;
+    const distance = Math.sqrt(dx * dx + dy * dy);
+    if (distance < enemy.radius) {
+      enemies.splice(index, 1);
+      console.log(`Enemy at (${enemy.x}, ${enemy.y}) was killed!`);
+    }
+  });
+});
 
-  // Log the coordinates to the console
-  console.log(`Mouse coordinates: (${x}, ${y})`);
+Promise.all([
+  loadImage(img1),
+  loadImage(img2),
+  loadImage(idleSprite),
+  loadImage(runningSprite),
+  loadImage(shootingSprite),
+  loadImage(hidingObject.image),
+]).then(() => {
+  draw();
+  enemies.forEach(enemy => {
+    setInterval(() => shootAtCharacter(enemy), 1000);
+  });
 });
