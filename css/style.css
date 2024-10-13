@@ -28,7 +28,7 @@ body {
 .bg_home::after {
     min-height: 100%;
     min-width: 100%;
-    content: "Click Here To Start";
+    content: "Click To Start";
     display: flex;
     justify-content: center;
     align-items: center;

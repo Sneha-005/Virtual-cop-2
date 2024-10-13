@@ -29,5 +29,5 @@ function animateText() {
 animateText();
 
 homeText.addEventListener("click", () => {
-  window.location.href = "html/city.html";
+  window.location.href = "html/RoundSelection.html";
 });

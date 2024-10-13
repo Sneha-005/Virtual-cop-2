@@ -6,12 +6,41 @@ class Character {
     this.height = height;
     this.color = color;
     this.speed = 5;
-    this.direction = null;
+    this.minSize = 20;
+    this.originalSize = width;
   }
 
   draw(ctx) {
     ctx.fillStyle = this.color;
     ctx.fillRect(this.x, this.y, this.width, this.height);
+  }
+
+  moveUp() {
+    this.y -= this.speed;
+    this.decreaseSize();
+  }
+
+  moveDown() {
+    this.y += this.speed;
+    this.increaseSize();
+  }
+
+  moveLeft() {
+    this.x -= this.speed;
+  }
+
+  moveRight() {
+    this.x += this.speed;
+  }
+
+  decreaseSize() {
+    this.width = Math.max(this.minSize, this.width - 1);
+    this.height = Math.max(this.minSize, this.height - 1);
+  }
+
+  increaseSize() {
+    this.width = Math.min(this.originalSize, this.width + 1);
+    this.height = Math.min(this.originalSize, this.height + 1);
   }
 
   update() {
@@ -62,6 +91,14 @@ document.addEventListener("keydown", (event) => {
   } else if (event.key === "ArrowRight") {
     img1X -= speed;
     img2X -= speed;
+  } else if (event.key === "w") {
+    character.moveUp();
+  } else if (event.key === "s") {
+    character.moveDown();
+  } else if (event.key === "a") {
+    character.moveLeft();
+  } else if (event.key === "d") {
+    character.moveRight();
   }
 
   if (img1X >= canvas.width) {
