@@ -28,6 +28,10 @@ function animateText() {
 
 animateText();
 
+
+
 homeText.addEventListener("click", () => {
   window.location.href = "html/roundSelection.html";
 });
+
+
