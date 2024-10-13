@@ -1,5 +1,4 @@
 const homeText = document.querySelector(".bg_home");
-
 let fontSize = 2.5;
 let increasing = true;
 
@@ -28,10 +27,7 @@ function animateText() {
 
 animateText();
 
-
-
 homeText.addEventListener("click", () => {
   window.location.href = "html/roundSelection.html";
 });
-
 

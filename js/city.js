@@ -142,13 +142,13 @@ document.addEventListener("keydown", (event) => {
   } else if (event.key === "ArrowRight") {
     img1X -= speed;
     img2X -= speed;
-  } else if (event.key === "w") {
+  } else if (event.key === "w" || event.key === "W") {
     character.moveUp();
-  } else if (event.key === "s") {
+  } else if (event.key === "s" || event.key === "S") {
     character.moveDown();
-  } else if (event.key === "a") {
+  } else if (event.key === "a" || event.key === "A") {
     character.moveLeft();
-  } else if (event.key === "d") {
+  } else if (event.key === "d" || event.key === "D") {
     character.moveRight();
   }
 
