@@ -25,7 +25,7 @@ const myAudio = document.getElementById("myAudio");
 function openWindowWithDelay() {
     setTimeout(function() {
       window.location.href = "city.html";
-    }, 3000); // Delay of 3000 milliseconds (3 seconds)
+    }, 3000);
   }
 
 city.addEventListener("click", function() {
