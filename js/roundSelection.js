@@ -10,6 +10,7 @@ window.addEventListener("load", function () {
             clearInterval(interval);
             loadingScreen.style.display = "none";
             content.style.display = "block";
+
         } else {
             progress += 1;
             loadingBar.style.width = progress + "%";
@@ -19,8 +20,11 @@ window.addEventListener("load", function () {
 });
 
 const city = document.getElementById("city");
+const myAudio = document.getElementById("myAudio");
+
 city.addEventListener("click", function() {
     window.location.href = "city.html";
+    myAudio.play();
 });
 
 const town = document.getElementById("town");
@@ -31,4 +35,18 @@ town.addEventListener("click", function() {
 const road = document.getElementById("road");
 road.addEventListener("click", function () {
   alert("Road(EXPERT LEVEL) is not available yet.");
+});
+
+const showButton = document.getElementById('showButton');
+const hideButton = document.getElementById('hideButton');
+const instructionPage = document.getElementById('instructionPage');
+
+showButton.addEventListener('click', () => {
+    instructionPage.style.display = 'block'; 
+    showButton.style.display = 'none'; 
+});
+
+hideButton.addEventListener('click', () => {
+    instructionPage.style.display = 'none'; 
+    showButton.style.display = 'inline-block'; 
 });
