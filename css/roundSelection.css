@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+
 *{
     margin: 0;
     padding: 0;
@@ -6,7 +8,7 @@
 body {
     background-color: black;
     color: white;
-    font-family: Arial, sans-serif;
+    font-family: 'Press Start 2P', sans-serif;
     text-align: center;
   }
 h1{
@@ -25,13 +27,11 @@ h1{
     left: 0;
 }
 
-/* Container for the loading bar and text */
 .loading-container {
     width: 80%;
     text-align: center;
 }
 
-/* Loading bar style */
 #loading-bar {
     width: 0;
     height: 20px;
