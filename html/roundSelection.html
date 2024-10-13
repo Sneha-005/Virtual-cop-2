@@ -5,10 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Virtual Cop 2</title>
     <link rel="stylesheet" href="../css/roundSelection.css">
+    <link rel="icon" href="https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/47264ce6-f9be-440a-8fe5-de7b40f003e7/deiabpa-7041c940-09d8-4e0b-9080-ff19435a0afd.png?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsIm9iaiI6W1t7InBhdGgiOiJcL2ZcLzQ3MjY0Y2U2LWY5YmUtNDQwYS04ZmU1LWRlN2I0MGYwMDNlN1wvZGVpYWJwYS03MDQxYzk0MC0wOWQ4LTRlMGItOTA4MC1mZjE5NDM1YTBhZmQucG5nIn1dXSwiYXVkIjpbInVybjpzZXJ2aWNlOmZpbGUuZG93bmxvYWQiXX0.SVF06oLj8ry4iwCOnuMkBQUY8-j__UDGdNiTkwCaPuQ" type="image/x-icon">
 </head>
 <body>
     <div id="loading-screen">
         <div class="loading-container">
+          <audio autoplay>
+            <source src="../sounds/11 - big chase.mp3"  type="audio/mpeg">
+          </audio>
             <h1>Loading Game...</h1>
             <div id="loading-bar"></div>
             <div id="loading-text">0%</div>
@@ -21,6 +25,7 @@
             <img src="../images/beginner.png" alt="Beginner">
             <p class="level beginner">BEGINNER</p>
           </div>
+          <audio id="myAudio" src="../sounds/gun-shot-1-176892.mp3"></audio>
           <div class="file" id="town">
             <img src="../images/medium.png" alt="Medium">
             <p class="level medium">MEDIUM</p>
@@ -32,6 +37,17 @@
         </div>
         <div class="instructions">
           <p>SHOOT TO SELECT</p>
+        </div>
+        <button id="showButton">Show Instructions</button>
+        <div id="instructionPage">
+          <h2>Game Instructions</h2>
+          <p>1. Use arrow keys to reach the next location.</p>
+          <p>3. Arrow Keys To move</p>
+          <p>A/a : left.</p>
+          <p>D/d : right</p>
+          <p>W/w : forward</p>
+          <p>S/s : backward</p>
+          <button id="hideButton">Hide Instructions</button>
         </div>
       </div>
     <script src="../js/roundSelection.js"></script>
