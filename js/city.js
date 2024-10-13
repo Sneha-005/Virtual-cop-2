@@ -5,7 +5,7 @@ class Character {
     this.width = width;
     this.height = height;
     this.color = color;
-    this.speed = 5;
+    this.speed = 10;
     this.minSize = 20;
     this.originalSize = width;
   }
@@ -16,21 +16,29 @@ class Character {
   }
 
   moveUp() {
-    this.y -= this.speed;
-    this.decreaseSize();
+    if (this.isInsideBoundary(this.x, this.y - this.speed)) {
+      this.y -= this.speed;
+      this.decreaseSize();
+    }
   }
 
   moveDown() {
-    this.y += this.speed;
-    this.increaseSize();
+    if (this.isInsideBoundary(this.x, this.y + this.speed)) {
+      this.y += this.speed;
+      this.increaseSize();
+    }
   }
 
   moveLeft() {
-    this.x -= this.speed;
+    if (this.isInsideBoundary(this.x - this.speed, this.y)) {
+      this.x -= this.speed;
+    }
   }
 
   moveRight() {
-    this.x += this.speed;
+    if (this.isInsideBoundary(this.x + this.speed, this.y)) {
+      this.x += this.speed;
+    }
   }
 
   decreaseSize() {
@@ -41,6 +49,18 @@ class Character {
   increaseSize() {
     this.width = Math.min(this.originalSize, this.width + 1);
     this.height = Math.min(this.originalSize, this.height + 1);
+  }
+
+  isInsideBoundary(x, y) {
+    let inside = false;
+    for (let i = 0, j = boundaries.length - 1; i < boundaries.length; j = i++) {
+      const [xi, yi] = boundaries[i];
+      const [xj, yj] = boundaries[j];
+      const intersect =
+        yi > y !== yj > y && x < ((xj - xi) * (y - yi)) / (yj - yi) + xi;
+      if (intersect) inside = !inside;
+    }
+    return inside;
   }
 
   update() {
@@ -55,7 +75,7 @@ canvas.height = window.innerHeight;
 
 const img1 = new Image();
 const img2 = new Image();
-img1.src = "../images/virtua.png";
+img1.src = "../images/city.jpg";
 img2.src = "../images/virtua.png";
 
 let img1X = 0;
@@ -66,10 +86,38 @@ const speed = 5;
 const character = new Character(
   canvas.width / 2 - 15,
   canvas.height - 60,
-  30,
-  30,
-  "blue"
+  60,
+  60,
+  "orange"
 );
+
+const boundaries = [
+  [158, 681],
+  [2, 373],
+  [0, 485],
+  [180, 525],
+  [160, 642],
+  [1480, 645],
+  [1456, 374],
+  [857, 368],
+  [525, 299],
+  [362, 260],
+  [208, 266],
+  [190, 376],
+  [0, 381],
+];
+
+function drawBoundaries() {
+  ctx.strokeStyle = "transparent";
+  ctx.beginPath();
+  for (let i = 0; i < boundaries.length; i++) {
+    const [x1, y1] = boundaries[i];
+    const [x2, y2] = boundaries[(i + 1) % boundaries.length];
+    ctx.moveTo(x1, y1);
+    ctx.lineTo(x2, y2);
+  }
+  ctx.stroke();
+}
 
 function draw() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -77,6 +125,9 @@ function draw() {
   // Draw background images
   ctx.drawImage(img1, img1X, 0, canvas.width, canvas.height);
   ctx.drawImage(img2, img2X, 0, canvas.width, canvas.height);
+
+  // Draw boundaries
+  drawBoundaries();
 
   // Draw character
   character.draw(ctx);
@@ -119,3 +170,15 @@ img1.onload = () => {
     draw();
   };
 };
+
+canvas.addEventListener("click", (event) => {
+  // Get the bounding rectangle of the canvas
+  const rect = canvas.getBoundingClientRect();
+
+  // Calculate the mouse coordinates relative to the canvas
+  const x = event.clientX - rect.left;
+  const y = event.clientY - rect.top;
+
+  // Log the coordinates to the console
+  console.log(`Mouse coordinates: (${x}, ${y})`);
+});
