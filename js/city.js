@@ -1,102 +1,121 @@
+class Character {
+  constructor(x, y, width, height, color) {
+    this.x = x;
+    this.y = y;
+    this.width = width;
+    this.height = height;
+    this.color = color;
+    this.speed = 5;
+    this.minSize = 20;
+    this.originalSize = width;
+  }
+
+  draw(ctx) {
+    ctx.fillStyle = this.color;
+    ctx.fillRect(this.x, this.y, this.width, this.height);
+  }
+
+  moveUp() {
+    this.y -= this.speed;
+    this.decreaseSize();
+  }
+
+  moveDown() {
+    this.y += this.speed;
+    this.increaseSize();
+  }
+
+  moveLeft() {
+    this.x -= this.speed;
+  }
+
+  moveRight() {
+    this.x += this.speed;
+  }
+
+  decreaseSize() {
+    this.width = Math.max(this.minSize, this.width - 1);
+    this.height = Math.max(this.minSize, this.height - 1);
+  }
+
+  increaseSize() {
+    this.width = Math.min(this.originalSize, this.width + 1);
+    this.height = Math.min(this.originalSize, this.height + 1);
+  }
+
+  update() {
+    // Character stays in the center, no need to update position
+  }
+}
+
 const canvas = document.getElementById("canvas");
 const ctx = canvas.getContext("2d");
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
-canvas.style.background = "black";
 
-const bgImages = ["bg1.jpg", "bg2.jpg", "bg3.jpg"];
-const backgrounds = [];
-let bgX = 0;
-let characterX = canvas.width / 2;
-const characterY = canvas.height - 50;
-let characterWidth = 50;
-let characterHeight = 50;
+const img1 = new Image();
+const img2 = new Image();
+img1.src = "../images/virtua.png";
+img2.src = "../images/virtua.png";
+
+let img1X = 0;
+let img2X = canvas.width;
+
 const speed = 5;
 
-const buildings = [
-  { x: 50, y: 0, width: 50, height: canvas.height },
-  { x: canvas.width - 100, y: 0, width: 50, height: canvas.height },
-];
+const character = new Character(
+  canvas.width / 2 - 15,
+  canvas.height - 60,
+  30,
+  30,
+  "blue"
+);
 
-bgImages.forEach((src, index) => {
-  const img = new Image();
-  img.src = src;
-  img.onload = () => {
-    backgrounds.push({ img, x: index * canvas.width });
-  };
-});
-
-function drawBackground() {
-  backgrounds.forEach((bg) => {
-    ctx.drawImage(bg.img, bg.x, 0, canvas.width, canvas.height);
-  });
-}
-
-function drawCharacter() {
-  ctx.fillStyle = "orange";
-  ctx.fillRect(characterX, characterY, characterWidth, characterHeight);
-}
-
-function drawBuildings() {
-  ctx.fillStyle = "gray";
-  buildings.forEach((building) => {
-    ctx.fillRect(building.x, building.y, building.width, building.height);
-  });
-}
-
-function updateBackground() {
-  backgrounds.forEach((bg) => {
-    bg.x -= speed;
-    if (bg.x <= -canvas.width) {
-      bg.x = (backgrounds.length - 1) * canvas.width;
-    }
-  });
-}
-
-function updateCharacter(direction) {
-  if (direction === "left") {
-    characterX -= speed;
-  } else if (direction === "right") {
-    characterX += speed;
-  } else if (direction === "up") {
-    characterWidth += 5;
-    characterHeight += 5;
-    buildings.forEach((building) => {
-      building.width -= 2;
-      building.height -= 10;
-      building.x += building.x < canvas.width / 2 ? -5 : 5;
-    });
-  } else if (direction === "down") {
-    characterWidth -= 5;
-    characterHeight -= 5;
-    buildings.forEach((building) => {
-      building.width += 2;
-      building.height += 10;
-      building.x += building.x < canvas.width / 2 ? 5 : -5;
-    });
-  }
-}
-
-function animate() {
+function draw() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
-  drawBackground();
-  drawBuildings();
-  drawCharacter();
-  requestAnimationFrame(animate);
+
+  // Draw background images
+  ctx.drawImage(img1, img1X, 0, canvas.width, canvas.height);
+  ctx.drawImage(img2, img2X, 0, canvas.width, canvas.height);
+
+  // Draw character
+  character.draw(ctx);
+
+  requestAnimationFrame(draw);
 }
 
-document.addEventListener("keydown", (e) => {
-  if (e.key === "ArrowLeft") {
-    updateCharacter("left");
-    updateBackground();
-  } else if (e.key === "ArrowRight") {
-    updateCharacter("right");
-    updateBackground();
-  } else if (e.key === "ArrowUp") {
-    updateCharacter("up");
-  } else if (e.key === "ArrowDown") {
-    updateCharacter("down");
+document.addEventListener("keydown", (event) => {
+  if (event.key === "ArrowLeft") {
+    img1X += speed;
+    img2X += speed;
+  } else if (event.key === "ArrowRight") {
+    img1X -= speed;
+    img2X -= speed;
+  } else if (event.key === "w") {
+    character.moveUp();
+  } else if (event.key === "s") {
+    character.moveDown();
+  } else if (event.key === "a") {
+    character.moveLeft();
+  } else if (event.key === "d") {
+    character.moveRight();
+  }
+
+  if (img1X >= canvas.width) {
+    img1X = img2X - canvas.width;
+  } else if (img1X <= -canvas.width) {
+    img1X = img2X + canvas.width;
+  }
+
+  if (img2X >= canvas.width) {
+    img2X = img1X - canvas.width;
+  } else if (img2X <= -canvas.width) {
+    img2X = img1X + canvas.width;
   }
 });
 
-animate();
+img1.onload = () => {
+  img2.onload = () => {
+    draw();
+  };
+};
