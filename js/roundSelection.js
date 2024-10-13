@@ -22,9 +22,18 @@ window.addEventListener("load", function () {
 const city = document.getElementById("city");
 const myAudio = document.getElementById("myAudio");
 
+function openWindowWithDelay() {
+    setTimeout(function() {
+      window.location.href = "city.html";
+    }, 3000);
+  }
+
 city.addEventListener("click", function() {
-    window.location.href = "city.html";
     myAudio.play();
+    town.style.opacity = -0.5;
+    road.style.opacity = -0.5;
+    openWindowWithDelay();
+    
 });
 
 const town = document.getElementById("town");
