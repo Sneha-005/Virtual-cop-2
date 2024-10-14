@@ -19,10 +19,10 @@ export class Character {
     this.spriteWidth = 128;
     this.spriteHeight = 128;
     this.shootingTimeout = null;
-    this.frameInterval = 10; 
+    this.frameInterval = 10;
     this.frameCounter = 0;
-    this.facingRight = true; 
-    this.boundaries = boundaries; 
+    this.facingRight = true;
+    this.boundaries = boundaries;
   }
 
   setIdle() {
@@ -43,7 +43,7 @@ export class Character {
     }
     this.shootingTimeout = setTimeout(() => {
       this.setIdle();
-    }, this.frameCounts["shooting"] * 100); 
+    }, this.frameCounts["shooting"] * 100);
   }
 
   moveLeft(hidingObject) {
@@ -178,7 +178,7 @@ export class Character {
   }
 
   getCollisionBox(x = this.x, y = this.y) {
-    const reducedWidth = this.spriteWidth * 0.7; 
+    const reducedWidth = this.spriteWidth * 0.7;
     const reducedHeight = this.spriteHeight * 0.5;
     const centerX = x + this.spriteWidth / 2;
     const centerY = y + this.spriteHeight / 2;
@@ -191,6 +191,7 @@ export class Character {
     };
   }
 }
+
 export class HidingObject {
   constructor(x, y, width, height, imageSrc, frameCount) {
     this.x = x;
@@ -201,28 +202,57 @@ export class HidingObject {
     this.image.src = imageSrc;
     this.frameCount = frameCount;
     this.frameIndex = 0;
-    this.frameInterval = 10; 
+    this.frameInterval = 10;
     this.frameCounter = 0;
+    this.isDestroyed = false;
+    this.destroyedSprite = new Image();
+    this.destroyedSprite.src = "../images/Destroyed.png"; // Path to the destroyed sprite sheet
+    this.destroyedFrameCount = 10; // Number of frames in the destroyed animation
+    this.destroyedFrameIndex = 0;
+    this.destroyedFrameInterval = 10;
+    this.destroyedFrameCounter = 0;
   }
 
   draw(context) {
-    this.frameCounter++;
-    if (this.frameCounter >= this.frameInterval) {
-      this.frameIndex = (this.frameIndex + 1) % this.frameCount;
-      this.frameCounter = 0;
+    if (this.isDestroyed) {
+      this.destroyedFrameCounter++;
+      if (this.destroyedFrameCounter >= this.destroyedFrameInterval) {
+        this.destroyedFrameIndex++;
+        this.destroyedFrameCounter = 0;
+      }
+      if (this.destroyedFrameIndex < this.destroyedFrameCount) {
+        const frameX = this.destroyedFrameIndex * this.width;
+        context.drawImage(
+          this.destroyedSprite,
+          frameX,
+          0,
+          this.width,
+          this.height,
+          this.x,
+          this.y,
+          this.width,
+          this.height
+        );
+      }
+    } else {
+      this.frameCounter++;
+      if (this.frameCounter >= this.frameInterval) {
+        this.frameIndex = (this.frameIndex + 1) % this.frameCount;
+        this.frameCounter = 0;
+      }
+      const frameX = this.frameIndex * this.width;
+      context.drawImage(
+        this.image,
+        frameX,
+        0,
+        this.width,
+        this.height,
+        this.x,
+        this.y,
+        this.width,
+        this.height
+      );
     }
-    const frameX = this.frameIndex * this.width;
-    context.drawImage(
-      this.image,
-      frameX,
-      0,
-      this.width,
-      this.height,
-      this.x,
-      this.y,
-      this.width,
-      this.height
-    );
   }
 
   isCharacterBehind(character) {
@@ -236,7 +266,7 @@ export class HidingObject {
 
   getCollisionBox() {
     const reducedWidth = this.width * 0.7;
-    const reducedHeight = this.height * 0.5; 
+    const reducedHeight = this.height * 0.5;
     const centerX = this.x + this.width / 2;
     const centerY = this.y + this.height / 2;
 
@@ -246,5 +276,34 @@ export class HidingObject {
       objTop: centerY - reducedHeight / 2,
       objBottom: centerY + reducedHeight / 2,
     };
+  }
+
+  triggerDestruction() {
+    this.isDestroyed = true;
+    this.destroyedFrameIndex = 0;
+    this.destroyedFrameCounter = 0;
+  }
+}
+
+export class Enemy {
+  constructor(x, y) {
+    this.x = x;
+    this.y = y;
+    this.radius = 20; // Example radius for collision detection
+  }
+
+  draw(ctx) {
+    ctx.beginPath();
+    ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+    ctx.fillStyle = "red";
+    ctx.fill();
+    ctx.closePath();
+  }
+
+  isCharacterColliding(character) {
+    const dx = this.x - (character.x + character.spriteWidth / 2);
+    const dy = this.y - (character.y + character.spriteHeight / 2);
+    const distance = Math.sqrt(dx * dx + dy * dy);
+    return distance < this.radius + character.spriteWidth / 2;
   }
 }
