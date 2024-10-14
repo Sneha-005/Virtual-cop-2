@@ -7,3 +7,22 @@
 body{
     overflow: hidden;
 }
+
+button {
+    position: absolute;
+    bottom: 20px;
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+    background-color: rgb(178, 125, 56);
+    color: aliceblue;
+  }
+  
+  #restartButton {
+    left: 30px; 
+  }
+  
+  #backButton {
+    right: 30px;  
+  }
+  
