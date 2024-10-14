@@ -4,6 +4,7 @@ import { Enemy } from "./enemy.js";
 
 const canvas = document.getElementById("canvas");
 const ctx = canvas.getContext("2d");
+const myAudio = document.getElementById("myAudio");
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 
@@ -16,6 +17,14 @@ let img1X = 0;
 let img2X = canvas.width;
 
 const speed = 5;
+
+let score = 0;
+
+function drawScore() {
+  ctx.font = "24px Arial";
+  ctx.fillStyle = "yellow";
+  ctx.fillText("KILL: " + score, 30, 30);
+}
 
 const boundaries = [
   [158, 681],
@@ -124,6 +133,8 @@ function draw() {
     }
   });
 
+  drawScore(); 
+
   requestAnimationFrame(draw);
 }
 
@@ -144,6 +155,12 @@ function shootAtCharacter(enemy) {
 
 document.addEventListener("keydown", (event) => {
   switch (event.key) {
+    case "ArrowLeft":
+      img1X += speed;
+      img2X += speed;
+    case "ArrowRight":
+      img1X -= speed;
+      img2X -= speed;
     case "w":
       character.moveUp(hidingObject);
       break;
@@ -181,6 +198,8 @@ document.addEventListener("keyup", (event) => {
 canvas.addEventListener("click", (event) => {
   const facingRight = event.clientX >= canvas.width / 2;
   character.shoot(facingRight);
+  myAudio.currentTime = 0; 
+  myAudio.play();
   console.log(`Mouse click coordinates: (${event.clientX}, ${event.clientY})`);
 
   enemies.forEach((enemy, index) => {
@@ -189,6 +208,7 @@ canvas.addEventListener("click", (event) => {
     const distance = Math.sqrt(dx * dx + dy * dy);
     if (distance < enemy.radius) {
       enemies.splice(index, 1);
+      score++; 
       console.log(`Enemy at (${enemy.x}, ${enemy.y}) was killed!`);
     }
   });
@@ -207,3 +227,4 @@ Promise.all([
     setInterval(() => shootAtCharacter(enemy), 1000);
   });
 });
+
