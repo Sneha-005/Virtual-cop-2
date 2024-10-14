@@ -124,8 +124,8 @@ function draw() {
 
   drawBoundaries();
 
-  const characterWidth = character.spriteWidth * 1.5; // Increase width by 50%
-  const characterHeight = character.spriteHeight * 1.5; // Increase height by 50%
+  const characterWidth = character.spriteWidth * 1.5; 
+  const characterHeight = character.spriteHeight * 1.5; 
 
   if (hidingObject.isCharacterBehind(character)) {
     hidingObject.draw(ctx);
@@ -193,12 +193,6 @@ function respawnEnemy(index) {
 
 document.addEventListener("keydown", (event) => {
   switch (event.key) {
-    case "ArrowLeft":
-      img1X += speed;
-      img2X += speed;
-    case "ArrowRight":
-      img1X -= speed;
-      img2X -= speed;
     case "w":
       character.moveUp(hidingObject);
       break;
@@ -316,3 +310,23 @@ Promise.all([
   });
 });
 
+
+const restartButton = document.getElementById("restartButton");
+const backButton = document.getElementById("backButton");
+
+function restartGame() {
+  character.x = (canvas.width - character.spriteWidth) / 2;
+  character.y = canvas.height - character.spriteHeight - 100;
+  enemies.length = 0;  
+  enemyPoints.forEach(point => enemies.push(new Enemy(point.x, point.y)));  
+  score = 0;
+  console.log("Game restarted!");
+}
+
+function goBack() {
+  window.location.href = "../html/roundSelection.html"; 
+  console.log("Going back to menu...");
+}
+
+restartButton.addEventListener("click", restartGame);
+backButton.addEventListener("click", goBack);
