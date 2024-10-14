@@ -9,7 +9,7 @@ canvas.height = window.innerHeight;
 const img1 = new Image();
 const img2 = new Image();
 img1.src = "../images/city.jpg";
-img2.src = "../images/virtua.png";
+img2.src = "../images/city.jpg";
 
 let img1X = 0;
 let img2X = canvas.width;
