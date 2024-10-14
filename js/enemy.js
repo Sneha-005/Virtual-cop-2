@@ -40,6 +40,17 @@ export class Enemy {
       this.height
     );
     ctx.restore();
+
+    this.radius = 10;
+    this.image = new Image();
+    this.image.src = "../images/Gangster.png";
+    this.spriteWidth = 50;  
+    this.spriteHeight = 77;
+  }
+
+  draw(context) {
+ 
+    context.drawImage(this.image, this.x - this.spriteWidth / 2, this.y - this.spriteHeight / 2, this.spriteWidth, this.spriteHeight);
   }
 
   isCharacterColliding(character) {

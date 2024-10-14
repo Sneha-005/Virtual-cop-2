@@ -4,18 +4,27 @@ import { HidingObject } from "./hiddenObject.js";
 
 const canvas = document.getElementById("canvas");
 const ctx = canvas.getContext("2d");
+const myAudio = document.getElementById("myAudio");
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 
 const img1 = new Image();
 const img2 = new Image();
 img1.src = "../images/city.jpg";
-img2.src = "../images/virtua.png";
+img2.src = "../images/city.jpg";
 
 let img1X = 0;
 let img2X = canvas.width;
 
 const speed = 5;
+
+let score = 0;
+
+function drawScore() {
+  ctx.font = "24px Arial";
+  ctx.fillStyle = "yellow";
+  ctx.fillText("KILL: " + score, 30, 30);
+}
 
 const boundaries = [
   [163, 518],
@@ -117,11 +126,6 @@ function draw() {
 
   drawBoundaries();
 
-  hidingObject.draw(ctx); // Draw hiding object first
-
-  const characterWidth = character.spriteWidth * 1.5; // Increase width by 50%
-  const characterHeight = character.spriteHeight * 1.5; // Increase height by 50%
-
   character.updateFrame();
   character.draw(ctx, characterWidth, characterHeight);
 
@@ -130,7 +134,6 @@ function draw() {
     enemy.draw(ctx, canvas.width / 2);
   });
 
-  // Draw the target symbol at the mouse cursor position
   ctx.drawImage(
     targetSymbol,
     targetX - targetSize / 2,
@@ -266,6 +269,9 @@ canvas.addEventListener("click", (event) => {
   targetClicked = true;
 
   const facingRight = event.clientX >= canvas.width / 2;
+  character.shoot(facingRight);
+  myAudio.currentTime = 0; 
+  myAudio.play();
   character.shoot(facingRight, () => {
     targetClicked = false;
     targetSize = 100;
@@ -280,6 +286,7 @@ canvas.addEventListener("click", (event) => {
     const distance = Math.sqrt(dx * dx + dy * dy);
     if (distance < enemy.width / 2) {
       enemies.splice(index, 1);
+      score++; 
       console.log(`Enemy at (${enemy.x}, ${enemy.y}) was killed!`);
       targetEnemy = null;
     }
@@ -330,3 +337,24 @@ Promise.all([
   spawnNextEnemy();
   draw();
 });
+
+
+const restartButton = document.getElementById("restartButton");
+const backButton = document.getElementById("backButton");
+
+function restartGame() {
+  character.x = (canvas.width - character.spriteWidth) / 2;
+  character.y = canvas.height - character.spriteHeight - 100;
+  enemies.length = 0;  
+  enemyPoints.forEach(point => enemies.push(new Enemy(point.x, point.y)));  
+  score = 0;
+  console.log("Game restarted!");
+}
+
+function goBack() {
+  window.location.href = "../html/roundSelection.html"; 
+  console.log("Going back to menu...");
+}
+
+restartButton.addEventListener("click", restartGame);
+backButton.addEventListener("click", goBack);
