@@ -88,12 +88,15 @@ export class HidingObject {
     this.isDestroyed = true;
     this.destroyedFrameIndex = 0;
     this.destroyedFrameCounter = 0;
-  }
-
-  triggerDestruction() {
-    this.destroyed = true;
     setTimeout(() => {
-      this.destroyed = false;
+      this.isDestroyed = false;
     }, 3000);
   }
+
+  // triggerDestruction() {
+  //   this.destroyed = true;
+  //   setTimeout(() => {
+  //     this.destroyed = false;
+  //   }, 3000);
+  // }
 }
