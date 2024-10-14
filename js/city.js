@@ -1,4 +1,6 @@
-import { Character, HidingObject, Enemy } from "./classes.js";
+import { Character } from "./character.js";
+import { Enemy } from "./enemy.js";
+import { HidingObject } from "./hiddenObject.js";
 
 const canvas = document.getElementById("canvas");
 const ctx = canvas.getContext("2d");
@@ -16,19 +18,15 @@ let img2X = canvas.width;
 const speed = 5;
 
 const boundaries = [
-  [158, 681],
-  [2, 373],
-  [0, 485],
-  [180, 525],
-  [160, 692],
-  [1480, 695],
-  [1456, 374],
-  [857, 368],
-  [525, 299],
-  [362, 260],
-  [208, 266],
-  [190, 376],
-  [0, 381],
+  [163, 518],
+  [143, 692],
+  [1533, 659],
+  [1528, 353],
+  [910, 309],
+  [381, 189],
+  [209, 186],
+  [182, 346],
+  [3, 338],
 ];
 
 const idleSprite = new Image();
@@ -37,12 +35,14 @@ const runningSprite = new Image();
 runningSprite.src = "../images/Run.png";
 const shootingSprite = new Image();
 shootingSprite.src = "../images/Shot_1.png";
+const enemySprite = new Image();
+enemySprite.src = "../images/Enemy.png"; // Add your enemy sprite image path here
 
 const character = new Character(
   idleSprite,
   runningSprite,
   shootingSprite,
-  5,
+  15,
   {
     idle: 7,
     running: 8,
@@ -64,14 +64,16 @@ const hidingObject = new HidingObject(
 );
 
 const enemyPoints = [
-  { x: 644, y: 141 },
-  { x: 176, y: 282 },
-  { x: 984, y: 306 },
-  { x: 1163, y: 311 },
-  { x: 476, y: 266 },
+  { x: 644, y: 121 },
+  { x: 488, y: 241 },
+  { x: 176, y: 262 },
+  { x: 984, y: 276 },
+  { x: 1163, y: 291 },
 ];
 
-let enemies = enemyPoints.map((point) => new Enemy(point.x, point.y));
+let enemies = [];
+let currentEnemyIndex = 0;
+let targetEnemy = null;
 
 const safeZone = {
   x1: 332,
@@ -115,38 +117,20 @@ function draw() {
 
   drawBoundaries();
 
+  hidingObject.draw(ctx); // Draw hiding object first
+
   const characterWidth = character.spriteWidth * 1.5; // Increase width by 50%
   const characterHeight = character.spriteHeight * 1.5; // Increase height by 50%
 
-  if (hidingObject.isCharacterBehind(character)) {
-    hidingObject.draw(ctx);
-    character.updateFrame();
-    character.draw(ctx, characterWidth, characterHeight);
-  } else {
-    character.updateFrame();
-    character.draw(ctx, characterWidth, characterHeight);
-    hidingObject.draw(ctx);
-  }
-
-  enemies.forEach((enemy) => enemy.draw(ctx));
+  character.updateFrame();
+  character.draw(ctx, characterWidth, characterHeight);
 
   enemies.forEach((enemy) => {
-    if (
-      enemy.isCharacterColliding(character) &&
-      !isCharacterInSafeZone(character)
-    ) {
-      console.log("Character collided with enemy!");
-    }
+    enemy.updateFrame();
+    enemy.draw(ctx, canvas.width / 2);
   });
 
-  if (targetClicked) {
-    targetSize -= 2;
-    if (targetSize <= 0) {
-      targetSize = 100;
-      targetClicked = false;
-    }
-  }
-
+  // Draw the target symbol at the mouse cursor position
   ctx.drawImage(
     targetSymbol,
     targetX - targetSize / 2,
@@ -154,8 +138,6 @@ function draw() {
     targetSize,
     targetSize
   );
-
-  hidingObject.draw(ctx);
 
   requestAnimationFrame(draw);
 }
@@ -177,8 +159,34 @@ function shootAtCharacter(enemy) {
 
 function respawnEnemy(index) {
   setTimeout(() => {
-    enemies.push(new Enemy(enemyPoints[index].x, enemyPoints[index].y));
+    enemies.push(
+      new Enemy(
+        enemyPoints[index].x,
+        enemyPoints[index].y,
+        enemySprite,
+        128,
+        128,
+        4
+      )
+    );
   }, 3000);
+}
+
+function spawnNextEnemy() {
+  if (currentEnemyIndex < enemyPoints.length) {
+    const point = enemyPoints[currentEnemyIndex];
+    const enemy = new Enemy(point.x, point.y, enemySprite, 128, 128, 4);
+    enemies.push(enemy);
+    targetEnemy = enemy;
+    targetX = enemy.x;
+    targetY = enemy.y;
+    currentEnemyIndex++;
+  } else {
+    currentEnemyIndex = 0; // Reset index to loop through enemy points again
+  }
+
+  // Call spawnNextEnemy again after a delay to continuously spawn enemies
+  setTimeout(spawnNextEnemy, 3000);
 }
 
 document.addEventListener("keydown", (event) => {
@@ -233,33 +241,52 @@ document.addEventListener("keyup", (event) => {
 });
 
 canvas.addEventListener("mousemove", (event) => {
-  targetX = event.clientX;
-  targetY = event.clientY;
+  const rect = canvas.getBoundingClientRect();
+  targetX = event.clientX - rect.left;
+  targetY = event.clientY - rect.top;
+
+  if (targetEnemy) {
+    const dx = targetX - targetEnemy.x;
+    const dy = targetY - targetEnemy.y;
+    const distance = Math.sqrt(dx * dx + dy * dy);
+    if (distance < targetEnemy.width / 2) {
+      targetSize = 80; // Reduce target size to 80%
+    } else {
+      targetSize = 100; // Reset target size
+    }
+  }
 });
 
 canvas.addEventListener("click", (event) => {
+  const rect = canvas.getBoundingClientRect();
+  const x = event.clientX - rect.left;
+  const y = event.clientY - rect.top;
+  showClickPoint(x, y);
+
   targetClicked = true;
 
   const facingRight = event.clientX >= canvas.width / 2;
   character.shoot(facingRight, () => {
     targetClicked = false;
-    targetSize = 50;
+    targetSize = 100;
   });
   console.log(`Mouse click coordinates: (${event.clientX}, ${event.clientY})`);
 
   enemies.forEach((enemy, index) => {
-    const dx = event.clientX - enemy.x;
-    const dy = event.clientY - enemy.y;
+    const enemyCenterX = enemy.x;
+    const enemyCenterY = enemy.y;
+    const dx = x - enemyCenterX;
+    const dy = y - enemyCenterY;
     const distance = Math.sqrt(dx * dx + dy * dy);
-    if (distance < enemy.radius) {
+    if (distance < enemy.width / 2) {
       enemies.splice(index, 1);
       console.log(`Enemy at (${enemy.x}, ${enemy.y}) was killed!`);
-      respawnEnemy(index);
+      targetEnemy = null;
     }
   });
 
-  const dx = event.clientX - hidingObject.x;
-  const dy = event.clientY - hidingObject.y;
+  const dx = event.clientX - hidingObject.x + 12;
+  const dy = event.clientY - hidingObject.y - 180;
   const distance = Math.sqrt(dx * dx + dy * dy);
   if (distance < hidingObject.width / 2) {
     clickCount++;
@@ -280,6 +307,15 @@ canvas.addEventListener("click", (event) => {
   }
 });
 
+// Function to show mouse click point
+function showClickPoint(x, y) {
+  ctx.beginPath();
+  ctx.arc(x, y, 5, 0, Math.PI * 2, true); // Draw a circle at the click point
+  ctx.fillStyle = "red";
+  ctx.fill();
+  ctx.closePath();
+}
+
 Promise.all([
   loadImage(img1),
   loadImage(img2),
@@ -289,9 +325,8 @@ Promise.all([
   loadImage(hidingObject.image),
   loadImage(targetSymbol),
   loadImage(hidingObject.destroyedSprite),
+  loadImage(enemySprite),
 ]).then(() => {
+  spawnNextEnemy();
   draw();
-  enemies.forEach((enemy, index) => {
-    setInterval(() => shootAtCharacter(enemy), 1000);
-  });
 });

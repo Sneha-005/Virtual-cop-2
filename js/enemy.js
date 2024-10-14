@@ -1,20 +1,50 @@
 export class Enemy {
-  constructor(x, y) {
+  constructor(x, y, sprite, width, height, frames) {
     this.x = x;
     this.y = y;
-    this.radius = 10;
+    this.sprite = sprite;
+    this.width = width;
+    this.height = height;
+    this.frames = frames;
+    this.currentFrame = 0;
+    this.frameCount = 0;
+    this.frameSpeed = 10; // Adjust the speed of animation
+    this.radius = 64; // Adjust as needed for collision detection
   }
 
-  draw(context) {
-    context.fillStyle = "red";
-    context.beginPath();
-    context.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
-    context.fill();
+  updateFrame() {
+    this.frameCount++;
+    if (this.frameCount >= this.frameSpeed) {
+      this.frameCount = 0;
+      this.currentFrame = (this.currentFrame + 1) % this.frames;
+    }
+  }
+
+  draw(ctx, canvasHalfWidth) {
+    const frameX = this.currentFrame * this.width;
+    ctx.save();
+    if (this.x > canvasHalfWidth) {
+      ctx.translate(this.x + this.width / 2, this.y);
+      ctx.scale(-1, 1);
+      ctx.translate(-this.x - this.width / 2, -this.y);
+    }
+    ctx.drawImage(
+      this.sprite,
+      frameX,
+      0,
+      this.width,
+      this.height,
+      this.x - this.width / 2,
+      this.y - this.height / 2,
+      this.width,
+      this.height
+    );
+    ctx.restore();
   }
 
   isCharacterColliding(character) {
-    const dx = this.x - (character.x + character.spriteWidth / 2);
-    const dy = this.y - (character.y + character.spriteHeight / 2);
+    const dx = this.x - character.x;
+    const dy = this.y - character.y;
     const distance = Math.sqrt(dx * dx + dy * dy);
     return distance < this.radius + character.spriteWidth / 2;
   }
