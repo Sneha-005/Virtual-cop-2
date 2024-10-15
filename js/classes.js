@@ -289,15 +289,15 @@ export class Enemy {
   constructor(x, y) {
     this.x = x;
     this.y = y;
-    this.radius = 20; // Example radius for collision detection
+    this.radius = 10;
+    this.image = new Image();
+    this.image.src = "../images/Gangster.png";
+    this.spriteWidth = 50;  
+    this.spriteHeight = 77;
   }
 
-  draw(ctx) {
-    ctx.beginPath();
-    ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
-    ctx.fillStyle = "red";
-    ctx.fill();
-    ctx.closePath();
+  draw(context) {
+    context.drawImage(this.image, this.x - this.spriteWidth / 2, this.y - this.spriteHeight / 2, this.spriteWidth, this.spriteHeight);
   }
 
   isCharacterColliding(character) {
@@ -307,3 +307,4 @@ export class Enemy {
     return distance < this.radius + character.spriteWidth / 2;
   }
 }
+

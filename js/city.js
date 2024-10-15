@@ -13,7 +13,6 @@ img2.src = "../images/city.jpg";
 
 let img1X = 0;
 let img2X = canvas.width;
-
 const speed = 5;
 
 let score = 0;
