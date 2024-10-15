@@ -3,7 +3,7 @@ const homeText = document.querySelector(".bg_home");
 let fontSize = 2.5;
 let increasing = true;
 
-//udating font
+
 function updateFontSize() {
   homeText.style.setProperty("--font-size", `${fontSize}rem`);
 }
